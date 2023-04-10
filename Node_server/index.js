@@ -1,7 +1,10 @@
 import express from "express";
+import dotenv from "dotenv";
+import connectDatabase from "./database.js";
 
 const app = express();
-
+dotenv.config();
+connectDatabase();
 app.get("/", (req, res) => {
   for (let i = 1; i < 10000000; i++) {
     console.log("Server :" + i);
