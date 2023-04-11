@@ -1,8 +1,11 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDatabase from "./database.js";
+import Pets from "./Schema/Pets.schema.js";
+import bodyParser from "body-parser";
 
 const app = express();
+app.use(bodyParser.json());
 dotenv.config();
 connectDatabase();
 app.get("/", (req, res) => {
@@ -12,26 +15,26 @@ app.get("/", (req, res) => {
   res.json("<h1>Started the server</h1>");
 });
 
-const pets = [
-  {
-    id: 1,
-    type: "dog",
-    price: 249.99,
-  },
-  {
-    id: 2,
-    type: "cat",
-    price: 124.99,
-  },
-  {
-    id: 3,
-    type: "fish",
-    price: 0.99,
-  },
-];
-app.get("/pets", (req, res) => {
+app.get("/pets", async (req, res) => {
+  console.log("pets");
+  const pets = await Pets.find({});
   res.send(pets);
 });
+
+app.post("/pets", async (req, res) => {
+  try {
+    const { type, price } = req.body;
+    console.log({ ...req });
+    console.log(type, price);
+    const pet = new Pets({ type, price });
+    await pet.save().then((pets) => {
+      res.send(pets);
+    });
+  } catch (e) {
+    res.send({ ...e });
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server is being hosted in the 3000 port.");
 });
